@@ -1,3 +1,4 @@
+
 "use strict";
 
 const DISCORD_URL = "https://discord.gg/Stzt94CTpu";
@@ -143,7 +144,7 @@ function stats() {
       <div class="container stats-grid">
         <div class="stat"><span class="stat-label">Prize pool</span><div class="stat-value gold">रू 21,000</div></div>
         <div class="stat"><span class="stat-label">Opening night</span><div class="stat-value">OCT 28 · 9 PM</div></div>
-        <div class="stat"><span class="stat-label">The format</span><div class="stat-value">5V5 · BO1</div></div>
+        <div class="stat"><span class="stat-label">The format</span><div class="stat-value">5V5 · BO1 / BO3</div></div>
         <div class="stat"><span class="stat-label">The server</span><div class="stat-value">MUMBAI</div></div>
         <div class="stat"><span class="stat-label">Eligibility</span><div class="stat-value">NEPALI PLAYERS</div></div>
       </div>
@@ -182,7 +183,7 @@ function homePage() {
           </div>
           <ul class="info-list">
             <li><span class="info-number">01</span><div><strong>Five together</strong><p>Bring five starting players. Add an optional sixth as your substitute.</p></div></li>
-            <li><span class="info-number">02</span><div><strong>Every round matters</strong><p>Best-of-one matches. Single elimination. No second chances.</p></div></li>
+            <li><span class="info-number">02</span><div><strong>Every round matters</strong><p>BO1 opening matches, followed by BO3 eliminations. One loss ends the run.</p></div></li>
             <li><span class="info-number">03</span><div><strong>Our home. Our stage.</strong><p>Nepali players only, competing on the Mumbai server.</p></div></li>
           </ul>
         </div>
@@ -226,7 +227,7 @@ function homePage() {
           <div>
             ${eyebrow("04 / The road is single elimination")}
             <h2>ONE LOSS ENDS IT.<br>ONE TEAM TAKES IT.</h2>
-            <p>Every match is BO1. Follow the path from the first elimination to the final. The 16-team opening draw is now available.</p>
+            <p>BO1 opening matches lead into BO3 elimination matches. Follow the 16-team draw through the four playoffs qualification spots.</p>
             ${button("bracket.html", "Explore the bracket", "btn btn-outline")}
           </div>
           <div class="card">
@@ -283,7 +284,7 @@ function homePage() {
 function infoPage() {
   const items = [
     ["01", "Eligibility", "Nepali players ONLY", "A tournament for Nepal's VALORANT community."],
-    ["02", "Match format", "5v5 · BO1 · Single elimination", "Five starting players, with an optional sixth substitute."],
+    ["02", "Match format", "5v5 · BO1 then BO3 · Single elimination", "Five starting players, with an optional sixth substitute."],
     ["03", "Server", "Mumbai", "All tournament matches use the Mumbai server."],
     ["04", "Start time", "October 28, 2026 · 9:00 PM NST", "NST means Nepal Standard Time (UTC+5:45)."],
     ["05", "Event window", "October 28–November 1, 2026", "Five consecutive days progressing toward the finals."],
@@ -299,8 +300,8 @@ function infoPage() {
           <div class="feature-panel">
             <div class="card-kicker">VALORANT / COMPETITIVE</div>
             <div class="big-format">5V5</div>
-            <h3>ONE MAP.<br>NO SECOND CHANCES.</h3>
-            <p>Best-of-one matches in a single-elimination tournament. A match loss ends your championship run.</p>
+            <h3>ONE CHANCE.<br>FIGHT FOR PLAYOFFS.</h3>
+            <p>The opening elimination matches are BO1, followed by four BO3 matches. Each BO3 winner qualifies for playoffs.</p>
           </div>
           <ul class="info-list">
             ${items.map(([n, label, value, desc]) => `
@@ -335,7 +336,7 @@ const scheduleDays = [
   { day: 1, date: "28", month: "OCT", weekday: "WED", title: "Opening night", desc: "The first step on the road to the Cup.", round: "Opening matches" },
   { day: 2, date: "29", month: "OCT", weekday: "THU", title: "The climb continues", desc: "Survive the night. Stay in the race.", round: "Elimination rounds" },
   { day: 3, date: "30", month: "OCT", weekday: "FRI", title: "The field narrows", desc: "The championship path gets tighter.", round: "Later elimination rounds" },
-  { day: 4, date: "31", month: "OCT", weekday: "SAT", title: "Finals in sight", desc: "A place on the final stage is within reach.", round: "Semifinals window" },
+  { day: 4, date: "31", month: "OCT", weekday: "SAT", title: "Finals in sight", desc: "A place on the final stage is within reach.", round: "Playoffs window" },
   { day: 5, date: "01", month: "NOV", weekday: "SUN", title: "Finals night", desc: "One team leaves as Jhilimili Cup champion.", round: "Championship final" }
 ];
 
@@ -376,10 +377,16 @@ function schedulePage() {
   `;
 }
 
-// Enter scores here after each completed game. For example:
-// "R16-1": [13, 9] means the first-listed team won 13–9.
-// Leave matches absent until the scores are officially confirmed.
-// Winners advance to the next round automatically when the page is re-published.
+// ======================================================
+// BRACKET DATA
+// ======================================================
+
+// Add confirmed scores after each match, then republish js/main.js.
+// BO1-1 through BO1-8: round scores, e.g. "BO1-1": [13, 9].
+// BO3-1 through BO3-4: MAP wins, e.g. "BO3-1": [2, 1].
+// BO1 winners fill BO3 matchups.
+// BO3 winners fill the four playoffs slots.
+
 const BRACKET_SCORES = {
 };
 
@@ -394,80 +401,131 @@ const OPENING_MATCHUPS = [
   ["RSP", "KHUWASAS"]
 ];
 
-function buildBracketMatch(id, teams) {
+function buildBracketMatch(id, teams, format) {
   const scores = BRACKET_SCORES[id];
   const valid = Array.isArray(scores) && scores.length === 2 &&
     scores.every(n => Number.isInteger(n) && n >= 0) &&
     scores[0] !== scores[1] &&
+    (format === "BO1" || (Math.max(...scores) === 2 && Math.min(...scores) <= 1)) &&
     teams.every(t => t && !t.startsWith("Winner "));
-  const winner = valid ? teams[scores[0] > scores[1] ? 0 : 1] : null;
-  return { id, teams, scores: valid ? scores : null, winner };
+
+  const winner = valid
+    ? teams[scores[0] > scores[1] ? 0 : 1]
+    : null;
+
+  return {
+    id,
+    teams,
+    format,
+    scores: valid ? scores : null,
+    winner
+  };
 }
 
 function bracketPage() {
-  const round16 = OPENING_MATCHUPS.map((teams, i) => buildBracketMatch(`R16-${i + 1}`, teams));
-  const buildNextRound = (previous, prefix) => Array.from({ length: previous.length / 2 }, (_, i) => {
-    const a = previous[i * 2], b = previous[i * 2 + 1];
-    return buildBracketMatch(`${prefix}-${i + 1}`, [
-      a.winner || `Winner ${a.id}`,
-      b.winner || `Winner ${b.id}`
-    ]);
-  });
-  const quarters = buildNextRound(round16, "QF");
-  const semis = buildNextRound(quarters, "SF");
-  const final = buildNextRound(semis, "FINAL");
-  const champion = final[0].winner;
+  const bo1Matches = OPENING_MATCHUPS.map((teams, i) =>
+    buildBracketMatch(`BO1-${i + 1}`, teams, "BO1")
+  );
 
-  const matchCard = (match) => `
+  const bo3Matches = Array.from({ length: 4 }, (_, i) => {
+    const first = bo1Matches[i * 2];
+    const second = bo1Matches[i * 2 + 1];
+
+    return buildBracketMatch(`BO3-${i + 1}`, [
+      first.winner || `Winner ${first.id}`,
+      second.winner || `Winner ${second.id}`
+    ], "BO3");
+  });
+
+  const matchCard = match => `
     <div class="match" data-bracket-match="${match.id}">
-      <div class="match-header"><span>${match.id.replace(/-/g, " ")}</span><span>BO1</span></div>
+      <div class="match-header">
+        <span>Match ${match.id.split("-")[1].padStart(2, "0")}</span>
+        <span>${match.format}</span>
+      </div>
       ${match.teams.map((team, i) => `
         <div class="team-slot ${team.startsWith("Winner ") ? "pending" : ""} ${match.winner === team ? "winner" : ""}">
-          <span>${team}</span><span class="team-score">${match.scores ? match.scores[i] : "—"}</span>
-        </div>`).join("")}
-    </div>`;
+          <span>${team}</span>
+          <span class="team-score">${match.scores ? match.scores[i] : "—"}</span>
+        </div>
+      `).join("")}
+    </div>
+  `;
+
   const roundColumn = (name, subtitle, matches) => `
     <section class="bracket-column">
       <span class="round-subtitle">${subtitle}</span>
       <h3>${name}</h3>
-      <div class="bracket-stack">${matches.map(matchCard).join("")}</div>
-    </section>`;
+      <div class="bracket-stack">
+        ${matches.map(matchCard).join("")}
+      </div>
+    </section>
+  `;
+
+  const qualifiers = bo3Matches.map((match, i) => `
+    <div class="playoffs-slot ${match.winner ? "qualified" : "pending"}"
+         data-bracket-match="PLAYOFF-${i + 1}">
+      <span class="playoffs-slot-number">0${i + 1}</span>
+      <span>${match.winner || "TBD"}</span>
+    </div>
+  `).join("");
 
   return `
     <main>
-      ${pageHero("Single elimination / 16 teams", "EVERY LINE LEADS TO ONE.", "The opening draw is set. Follow all 16 teams from the first round to the Jhilimili Cup champion. Scores and advancing teams will be updated after matches.")}
+      ${pageHero(
+        "Elimination stage / 16 teams",
+        "THE ROAD TO PLAYOFFS.",
+        "Eight BO1 opening matches lead to four BO3 elimination matches. Each BO3 winner earns one of the four Playoffs Qualified spots. Scores and advancing teams will be updated after each game."
+      )}
 
       <section class="container">
-        <div class="notice"><strong>✦ Opening bracket confirmed · 16 teams</strong><p>First-round pairings are shown below in the order provided by the organiser. Scores, winners and later-round matchups are pending results.</p></div>
-        <div class="section-heading"><span class="card-kicker">● 16 → 8 → 4 → 2 → Champion</span><span class="stat-label">Single elimination · BO1 · Mumbai server</span></div>
-        <p class="bracket-hint">← Swipe or scroll sideways to see every round →</p>
-        <div class="bracket-scroll" aria-label="16-team tournament bracket; horizontally scrollable">
+        <div class="notice">
+          <strong>✦ Opening bracket confirmed · 16 teams</strong>
+          <p>The first-round pairings are in the organiser's order. BO3 matchups will fill as BO1 results are confirmed. The four playoff qualifiers will be shown after their BO3 matches.</p>
+        </div>
+
+        <div class="section-heading">
+          <span class="card-kicker">● 16 teams → 8 winners → 4 playoffs qualifiers</span>
+          <span class="stat-label">BO1 elimination → BO3 elimination · Mumbai server</span>
+        </div>
+
+        <p class="bracket-hint">← Swipe or scroll sideways to view all three stages →</p>
+
+        <div class="bracket-scroll" aria-label="16-team elimination bracket; horizontally scrollable">
           <div class="bracket bracket-16">
             <svg class="bracket-wires" aria-hidden="true"></svg>
-            ${roundColumn("Round of 16", "8 opening matches", round16)}
-            ${roundColumn("Quarterfinals", "8 teams remain", quarters)}
-            ${roundColumn("Semifinals", "4 teams remain", semis)}
-            ${roundColumn("Grand final", "2 teams remain", final)}
-            <section class="bracket-column">
-              <span class="round-subtitle">1 team standing</span>
-              <h3 class="gold">Champion</h3>
+
+            ${roundColumn("BO1 Elimination", "16 teams · 8 matches", bo1Matches)}
+            ${roundColumn("BO3 Elimination", "8 teams · 4 matches", bo3Matches)}
+
+            <section class="bracket-column playoffs-column">
+              <span class="round-subtitle">4 spots available</span>
+              <h3 class="gold">Playoffs Qualified</h3>
+
               <div class="bracket-stack">
-                <div class="champion-box" data-bracket-match="CHAMPION">
-                  <div class="trophy">♜</div>
-                  <h3>${champion || "TBD"}</h3>
-                  <strong class="gold">रू 12,500</strong>
+                <div class="playoffs-box" aria-label="Four teams qualified for playoffs">
+                  ${qualifiers}
                 </div>
               </div>
             </section>
           </div>
         </div>
-        <p class="stat-label">Results pending / Match scores and winners will be updated following each game.</p>
+
+        <p class="stat-label">Elimination stage only / Scores and qualifiers will be updated after matches. Playoff rounds are not displayed here.</p>
       </section>
 
       <section class="section">
         <div class="container grid-2">
-          <div class="card"><h3>03 · Third place</h3><p>रू 2,500. Placement-match format and scheduling are provisional, awaiting organiser confirmation.</p></div>
-          <div class="card"><h3>October 28–November 1, 2026</h3><p>The tournament begins October 28 at 9:00 PM NST. See the five-day schedule for provisional round windows.</p>${button("schedule.html", "View schedule", "btn btn-outline")}</div>
+          <div class="card">
+            <h3>03 · Third place</h3>
+            <p>रू 2,500. Placement-match format and scheduling are provisional, awaiting organiser confirmation.</p>
+          </div>
+
+          <div class="card">
+            <h3>October 28–November 1, 2026</h3>
+            <p>The tournament begins October 28 at 9:00 PM NST. See the five-day schedule for provisional round windows.</p>
+            ${button("schedule.html", "View schedule", "btn btn-outline")}
+          </div>
         </div>
       </section>
     </main>
@@ -476,89 +534,166 @@ function bracketPage() {
 
 function setupBracketWires() {
   const bracket = document.querySelector(".bracket-16");
+
   if (!bracket) return;
+
   const svg = bracket.querySelector(".bracket-wires");
   const NS = "http://www.w3.org/2000/svg";
+
+  // Connect BO1 matches into BO3 matches,
+  // then BO3 matches into Playoffs Qualified.
+
   const edges = [];
-  for (let round of [["R16", "QF", 8], ["QF", "SF", 4], ["SF", "FINAL", 2]]) {
-    const [from, to, count] = round;
-    for (let i = 0; i < count / 2; i++) {
-      edges.push([[`${from}-${i * 2 + 1}`, `${from}-${i * 2 + 2}`], `${to}-${i + 1}`]);
-    }
+
+  for (let i = 0; i < 4; i++) {
+    edges.push([
+      [`BO1-${i * 2 + 1}`, `BO1-${i * 2 + 2}`],
+      `BO3-${i + 1}`
+    ]);
+
+    edges.push([
+      [`BO3-${i + 1}`],
+      `PLAYOFF-${i + 1}`
+    ]);
   }
-  edges.push([["FINAL-1"], "CHAMPION"]);
 
   function draw() {
     const root = bracket.getBoundingClientRect();
-    const width = bracket.offsetWidth, height = bracket.offsetHeight;
+    const width = bracket.offsetWidth;
+    const height = bracket.offsetHeight;
+
     svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
     svg.replaceChildren();
+
     for (const [sourceIds, destId] of edges) {
-      const targets = sourceIds.map(id => bracket.querySelector(`[data-bracket-match="${id}"]`));
-      const dest = bracket.querySelector(`[data-bracket-match="${destId}"]`);
+      const targets = sourceIds.map(id =>
+        bracket.querySelector(`[data-bracket-match="${id}"]`)
+      );
+
+      const dest = bracket.querySelector(
+        `[data-bracket-match="${destId}"]`
+      );
+
       if (targets.some(el => !el) || !dest) continue;
+
       const left = targets.map(el => {
         const b = el.getBoundingClientRect();
-        return { x: b.right - root.left, y: b.top + b.height / 2 - root.top };
+
+        return {
+          x: b.right - root.left,
+          y: b.top + b.height / 2 - root.top
+        };
       });
+
       const next = dest.getBoundingClientRect();
       const xEnd = next.left - root.left;
       const yEnd = next.top + next.height / 2 - root.top;
       const middle = (left[0].x + xEnd) / 2;
+
       let d;
+
       if (left.length === 1) {
-        d = `M ${left[0].x} ${left[0].y} H ${xEnd}`;
+        d = `M ${left[0].x} ${left[0].y} H ${middle} V ${yEnd} H ${xEnd}`;
       } else {
         const yMid = (left[0].y + left[1].y) / 2;
+
         d = `M ${left[0].x} ${left[0].y} H ${middle} V ${left[1].y} H ${left[1].x} M ${middle} ${yMid} H ${xEnd} V ${yEnd}`;
       }
+
       const path = document.createElementNS(NS, "path");
       path.setAttribute("d", d);
       svg.appendChild(path);
     }
   }
+
   draw();
+
   window.addEventListener("resize", draw);
-  if (document.fonts) document.fonts.ready.then(draw);
+
+  if (document.fonts) {
+    document.fonts.ready.then(draw);
+  }
 }
 
 function resultsPage() {
   return `
     <main>
-      ${pageHero("Results / The story so far", "THE GLORY IS STILL UP FOR GRABS.", "Jhilimili Cup has not started yet. No wins, no losses, no champions — just five nights of possibility ahead.")}
+      ${pageHero(
+        "Results / The story so far",
+        "THE GLORY IS STILL UP FOR GRABS.",
+        "Jhilimili Cup has not started yet. No wins, no losses, no champions — just five nights of possibility ahead."
+      )}
 
       <section class="container">
         <div class="results-hero">
           <div class="results-copy">
             <span class="results-status">⌛ The first round is still ahead</span>
-            <h2 style="font-size:clamp(38px,5vw,55px);margin-top:22px">NO SCORES YET.<br>ALL THE FIRE TO COME.</h2>
+
+            <h2 style="font-size:clamp(38px,5vw,55px);margin-top:22px">
+              NO SCORES YET.<br>ALL THE FIRE TO COME.
+            </h2>
+
             <p>Match results will appear once play begins. Final standings and the tournament MVP will be announced after the competition.</p>
+
             <hr style="border:0;border-top:1px solid var(--border);margin:24px 0">
+
             <span class="stat-label">Opening night</span>
             <h3 class="gold">OCTOBER 28, 2026 · 9:00 PM NST</h3>
-            <div class="hero-actions">${button("schedule.html", "View schedule")}${button(DISCORD_URL, "Follow on Discord", "btn btn-outline")}</div>
+
+            <div class="hero-actions">
+              ${button("schedule.html", "View schedule")}
+              ${button(DISCORD_URL, "Follow on Discord", "btn btn-outline")}
+            </div>
           </div>
-          <div class="results-art" aria-label="Decorative trophy symbol"><span>♜</span></div>
+
+          <div class="results-art" aria-label="Decorative trophy symbol">
+            <span>♜</span>
+          </div>
         </div>
       </section>
 
       <section class="section">
         <div class="container">
-          <div class="prize-total-row"><h2>रू 21,000 WAITING TO BE WON.</h2><span class="stat-label">No standings published yet</span></div>
+          <div class="prize-total-row">
+            <h2>रू 21,000 WAITING TO BE WON.</h2>
+            <span class="stat-label">No standings published yet</span>
+          </div>
+
           ${prizes()}
         </div>
       </section>
 
       <section class="section section-alt">
         <div class="container grid-3">
-          <article class="card"><span class="info-number">01</span><h3>Match scores</h3><p>Awaiting the first match. See the bracket for the opening pairings.</p></article>
-          <article class="card"><span class="info-number">02</span><h3>Final standings</h3><p>Champion, runner-up and third-place recipients are yet to be determined.</p></article>
-          <article class="card"><span class="info-number">03</span><h3>Tournament MVP</h3><p>The रू 1,000 individual award will be announced after the event.</p></article>
+          <article class="card">
+            <span class="info-number">01</span>
+            <h3>Match scores</h3>
+            <p>Awaiting the first match. See the bracket for the opening pairings.</p>
+          </article>
+
+          <article class="card">
+            <span class="info-number">02</span>
+            <h3>Final standings</h3>
+            <p>Champion, runner-up and third-place recipients are yet to be determined.</p>
+          </article>
+
+          <article class="card">
+            <span class="info-number">03</span>
+            <h3>Tournament MVP</h3>
+            <p>The रू 1,000 individual award will be announced after the event.</p>
+          </article>
         </div>
       </section>
 
       <section class="section">
-        <div class="container section-heading"><div><h2>THE CUP IS READY FOR ITS CONTENDERS.</h2><p>16 teams · Nepali players only · Opening matchups confirmed</p></div>${button("bracket.html", "View bracket")}</div>
+        <div class="container section-heading">
+          <div>
+            <h2>THE CUP IS READY FOR ITS CONTENDERS.</h2>
+            <p>16 teams · Nepali players only · Opening matchups confirmed</p>
+          </div>
+
+          ${button("bracket.html", "View bracket")}
+        </div>
       </section>
     </main>
   `;
@@ -567,26 +702,37 @@ function resultsPage() {
 function watchPage() {
   return `
     <main>
-      ${pageHero("Watch live / Join the community", "FEEL EVERY CLUTCH. SHARE EVERY CHEER.", "Not playing? You can still be part of the Jhilimili Cup. Follow the channels and join the Discord community for tournament updates.")}
+      ${pageHero(
+        "Watch live / Join the community",
+        "FEEL EVERY CLUTCH. SHARE EVERY CHEER.",
+        "Not playing? You can still be part of the Jhilimili Cup. Follow the channels and join the Discord community for tournament updates."
+      )}
 
       <section class="section" style="padding-top:15px">
         <div class="container grid-2">
           <article class="card watch-card">
             <div class="watch-icon">▶</div>
             <span class="card-kicker">Official stream destination</span>
+
             <h2>WATCH ON YOUTUBE.</h2>
+
             <p>Visit HealerAiko, AyuzZ and Rakshya's YouTube channels for stream access and broadcast announcements. A specific live-stream schedule has not yet been confirmed.</p>
+
             <div class="watch-channel-links">
               ${button(YOUTUBE_URL, "Open HealerAiko on YouTube")}
               ${button(AYUZZ_YOUTUBE_URL, "Open Ayush on YouTube")}
               ${button(RAKSHYA_YOUTUBE_URL, "Open Rakshya on YouTube")}
             </div>
           </article>
+
           <article class="card watch-card">
             <div class="watch-icon">✦</div>
             <span class="card-kicker">Official community</span>
+
             <h2>JOIN THE DISCORD.</h2>
+
             <p>Find tournament announcements, official rules, bracket updates and any match-viewing details shared by organiser Healer.</p>
+
             ${button(DISCORD_URL, "Join tournament Discord")}
           </article>
         </div>
@@ -595,11 +741,27 @@ function watchPage() {
       <section class="section section-alt">
         <div class="container">
           ${eyebrow("Your viewing checklist")}
+
           <h2>BE READY FOR FINALS NIGHT.</h2>
+
           <div class="grid-3" style="margin-top:25px">
-            <article class="card"><span class="info-number">01</span><h3>Follow the channel</h3><p>Subscribe to the YouTube channel and check for event-stream announcements.</p></article>
-            <article class="card"><span class="info-number">02</span><h3>Join the server</h3><p>Discord is the official home for rules, updates and tournament communications.</p></article>
-            <article class="card"><span class="info-number">03</span><h3>Keep the dates free</h3><p>October 28–November 1, 2026. The tournament starts at 9:00 PM NST on opening night.</p></article>
+            <article class="card">
+              <span class="info-number">01</span>
+              <h3>Follow the channel</h3>
+              <p>Subscribe to the YouTube channel and check for event-stream announcements.</p>
+            </article>
+
+            <article class="card">
+              <span class="info-number">02</span>
+              <h3>Join the server</h3>
+              <p>Discord is the official home for rules, updates and tournament communications.</p>
+            </article>
+
+            <article class="card">
+              <span class="info-number">03</span>
+              <h3>Keep the dates free</h3>
+              <p>October 28–November 1, 2026. The tournament starts at 9:00 PM NST on opening night.</p>
+            </article>
           </div>
         </div>
       </section>
@@ -662,7 +824,6 @@ function registerPage() {
       )}
 
       <section class="container form-layout">
-
         <form
           class="form-card"
           id="registration-form"
@@ -684,7 +845,6 @@ function registerPage() {
             </p>
 
             <div class="form-grid">
-
               <div class="field full">
                 <label for="teamName">Team name *</label>
                 <input
@@ -733,7 +893,6 @@ function registerPage() {
                   placeholder="captain@example.com"
                 >
               </div>
-
             </div>
           </section>
 
@@ -758,7 +917,6 @@ function registerPage() {
             </p>
 
             <div class="form-grid">
-
               <div class="field">
                 <label for="subName">Substitute player name</label>
                 <input
@@ -790,7 +948,6 @@ function registerPage() {
                   placeholder="Discord username"
                 >
               </div>
-
             </div>
           </section>
 
@@ -849,7 +1006,6 @@ function registerPage() {
         </form>
 
         <aside class="sidebar-sticky">
-
           <div class="side-card">
             <span class="card-kicker">● Entries closed October 26</span>
             <h2>REGISTRATION CLOSED.</h2>
@@ -878,17 +1034,18 @@ function registerPage() {
 
           <div class="card">
             <h3>NEED A HAND?</h3>
+
             <p>
               Contact Healer on Discord for tournament help
               and the full official rules.
             </p>
+
             ${button(
               DISCORD_URL,
               "Contact Healer",
               "btn btn-outline"
             )}
           </div>
-
         </aside>
       </section>
     </main>
@@ -942,15 +1099,24 @@ function setupRegistration() {
   if (!form) return;
 
   const message = document.getElementById("form-message");
+
   if (REGISTRATION_CLOSED) {
     form.classList.add("registration-closed");
+
     form.querySelectorAll("input, button[type=submit]").forEach(control => {
       control.disabled = true;
     });
+
     const submit = form.querySelector('button[type="submit"]');
-    if (submit) submit.textContent = "Registration closed";
+
+    if (submit) {
+      submit.textContent = "Registration closed";
+    }
+
     message.hidden = false;
-    message.textContent = "Registration closed on October 26, 2026. New team submissions are no longer accepted.";
+    message.textContent =
+      "Registration closed on October 26, 2026. New team submissions are no longer accepted.";
+
     form.addEventListener("submit", event => event.preventDefault());
     return;
   }
@@ -964,7 +1130,9 @@ function setupRegistration() {
       subName || subRiot || subDiscord
     );
 
-    // If any substitute detail is entered, require the name and Riot ID.
+    // If any substitute detail is entered, require
+    // the substitute name and Riot ID.
+
     if (hasSubstitute && (!subName || !subRiot)) {
       event.preventDefault();
 

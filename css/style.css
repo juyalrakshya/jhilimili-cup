@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=DM+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
@@ -217,17 +218,18 @@ p { color: var(--muted); }
 .footer-bottom { border-top: 1px solid var(--border); padding-top: 16px; display: flex; justify-content: space-between; gap: 16px; font-size: 10px; color: var(--muted); }
 .mobile-only { display: none; }
 
-/* 16-team progression — uses the site's existing dark/gold palette. */
+/* Three-stage elimination bracket: BO1 -> BO3 -> Playoffs Qualified. */
 .bracket.bracket-16 {
-  min-width: 1310px;
-  grid-template-columns: 1.2fr 1.1fr 1.1fr 1.1fr .85fr;
-  gap: 27px;
+  min-width: 1040px;
+  grid-template-columns: 1.2fr 1.14fr 1.02fr;
+  gap: 54px;
   position: relative;
   align-items: start;
   padding-bottom: 8px;
 }
 .bracket-16 .bracket-column { position: relative; z-index: 1; min-width: 0; }
 .bracket-16 .bracket-column h3 { color: var(--text); margin: 0 0 16px; font-size: 23px; }
+.bracket-16 .bracket-column h3.gold { color: var(--gold); }
 .bracket-16 .bracket-column .round-subtitle { display: block; color: var(--gold-dark); font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 4px; }
 .bracket-16 .bracket-stack { height: 945px; gap: 12px; justify-content: space-around; }
 .bracket-16 .match { flex-shrink: 0; border: 1px solid #383734; background: var(--panel); box-shadow: 0 5px 12px rgba(0,0,0,.16); }
@@ -236,10 +238,15 @@ p { color: var(--muted); }
 .bracket-16 .team-slot.pending { color: #91939a; }
 .bracket-16 .team-slot.winner { color: var(--gold); background: #242015; font-weight: 800; }
 .bracket-16 .team-slot .team-score { color: inherit; min-width: 17px; font-weight: 800; text-align: right; }
-.bracket-16 .champion-box { width: 100%; border-top: 2px solid var(--gold); padding: 25px 12px; }
-.bracket-16 .champion-box h3 { margin: 11px 0; color: var(--gold); overflow-wrap: anywhere; }
 .bracket-16 .bracket-wires { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; overflow: visible; }
 .bracket-16 .bracket-wires path { stroke: #74613a; stroke-width: 1.5; fill: none; }
+.bracket-16 .playoffs-column .bracket-stack { justify-content: center; }
+.bracket-16 .playoffs-box { border: 1px solid var(--gold-dark); border-top: 2px solid var(--gold); background: #241f16; padding: 12px 15px; box-shadow: 0 5px 18px rgba(0,0,0,.20); }
+.bracket-16 .playoffs-slot { min-height: 49px; display: flex; align-items: center; gap: 13px; padding: 9px 6px; border-bottom: 1px solid #443821; font-size: 12px; font-weight: 700; overflow-wrap: anywhere; }
+.bracket-16 .playoffs-slot:last-child { border-bottom: 0; }
+.bracket-16 .playoffs-slot.pending { color: #a0a2a8; }
+.bracket-16 .playoffs-slot.qualified { color: var(--gold); }
+.bracket-16 .playoffs-slot-number { color: var(--gold-dark); font-family: "Barlow Condensed", sans-serif; font-size: 18px; flex-shrink: 0; }
 .bracket-hint { color: var(--muted); font-size: 11px; margin-top: 6px; }
 .registration-closed input:disabled { opacity: .55; cursor: not-allowed; }
 .registration-closed button:disabled { background: var(--panel-light); color: var(--gold); border-color: var(--gold-dark); cursor: not-allowed; opacity: 1; transform: none; }
