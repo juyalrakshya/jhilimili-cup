@@ -378,16 +378,34 @@ function schedulePage() {
 }
 
 // ======================================================
-// BRACKET DATA
+// BRACKET RESULTS AND PROGRESSION
 // ======================================================
 
-// Add confirmed scores after each match, then republish js/main.js.
-// BO1-1 through BO1-8: round scores, e.g. "BO1-1": [13, 9].
-// BO3-1 through BO3-4: MAP wins, e.g. "BO3-1": [2, 1].
-// BO1 winners fill BO3 matchups.
-// BO3 winners fill the four playoffs slots.
+// BO1 winners from your latest reference image.
+// No scores have been invented.
+//
+// To update a BO3 match later, add its winner to
+// BRACKET_WINNERS, or its actual map score to
+// BRACKET_SCORES.
+//
+// Example: "BO3-1": [2, 1] means the first team
+// won two maps and the second team won one map.
+
+const BRACKET_WINNERS = {
+  "BO1-1": "RAZE THE ROOF",
+  "BO1-2": "LOADSHEDDING",
+  "BO1-3": "AUTUMN",
+  "BO1-4": "BATTI BALYO",
+  "BO1-5": "NIGGLE",
+  "BO1-6": "FORFETIC",
+  "BO1-7": "PROPHETIC",
+  "BO1-8": "KHUWASAS"
+};
 
 const BRACKET_SCORES = {
+  // Add real scores here when available.
+  // BO1 scores = rounds won.
+  // BO3 scores = maps won.
 };
 
 const OPENING_MATCHUPS = [
@@ -403,15 +421,26 @@ const OPENING_MATCHUPS = [
 
 function buildBracketMatch(id, teams, format) {
   const scores = BRACKET_SCORES[id];
-  const valid = Array.isArray(scores) && scores.length === 2 &&
+
+  const valid =
+    Array.isArray(scores) &&
+    scores.length === 2 &&
     scores.every(n => Number.isInteger(n) && n >= 0) &&
     scores[0] !== scores[1] &&
-    (format === "BO1" || (Math.max(...scores) === 2 && Math.min(...scores) <= 1)) &&
+    (
+      format === "BO1" ||
+      (Math.max(...scores) === 2 && Math.min(...scores) <= 1)
+    ) &&
     teams.every(t => t && !t.startsWith("Winner "));
 
-  const winner = valid
+  const scoreWinner = valid
     ? teams[scores[0] > scores[1] ? 0 : 1]
     : null;
+
+  const listedWinner = BRACKET_WINNERS[id];
+
+  const winner = scoreWinner ||
+    (teams.includes(listedWinner) ? listedWinner : null);
 
   return {
     id,
@@ -443,10 +472,13 @@ function bracketPage() {
         <span>Match ${match.id.split("-")[1].padStart(2, "0")}</span>
         <span>${match.format}</span>
       </div>
+
       ${match.teams.map((team, i) => `
         <div class="team-slot ${team.startsWith("Winner ") ? "pending" : ""} ${match.winner === team ? "winner" : ""}">
           <span>${team}</span>
-          <span class="team-score">${match.scores ? match.scores[i] : "—"}</span>
+          <span class="team-score">
+            ${match.scores ? match.scores[i] : "—"}
+          </span>
         </div>
       `).join("")}
     </div>
@@ -456,6 +488,7 @@ function bracketPage() {
     <section class="bracket-column">
       <span class="round-subtitle">${subtitle}</span>
       <h3>${name}</h3>
+
       <div class="bracket-stack">
         ${matches.map(matchCard).join("")}
       </div>
@@ -463,8 +496,10 @@ function bracketPage() {
   `;
 
   const qualifiers = bo3Matches.map((match, i) => `
-    <div class="playoffs-slot ${match.winner ? "qualified" : "pending"}"
-         data-bracket-match="PLAYOFF-${i + 1}">
+    <div
+      class="playoffs-slot ${match.winner ? "qualified" : "pending"}"
+      data-bracket-match="PLAYOFF-${i + 1}"
+    >
       <span class="playoffs-slot-number">0${i + 1}</span>
       <span>${match.winner || "TBD"}</span>
     </div>
@@ -481,29 +516,54 @@ function bracketPage() {
       <section class="container">
         <div class="notice">
           <strong>✦ Opening bracket confirmed · 16 teams</strong>
-          <p>The first-round pairings are in the organiser's order. BO3 matchups will fill as BO1 results are confirmed. The four playoff qualifiers will be shown after their BO3 matches.</p>
+          <p>The eight BO1 winners are shown in the four BO3 matchups, matching the organiser's latest bracket. The four playoff qualifiers will be shown after the BO3 results are confirmed.</p>
         </div>
 
         <div class="section-heading">
-          <span class="card-kicker">● 16 teams → 8 winners → 4 playoffs qualifiers</span>
-          <span class="stat-label">BO1 elimination → BO3 elimination · Mumbai server</span>
+          <span class="card-kicker">
+            ● 16 teams → 8 winners → 4 playoffs qualifiers
+          </span>
+
+          <span class="stat-label">
+            BO1 elimination → BO3 elimination · Mumbai server
+          </span>
         </div>
 
-        <p class="bracket-hint">← Swipe or scroll sideways to view all three stages →</p>
+        <p class="bracket-hint">
+          ← Swipe or scroll sideways to view all three stages →
+        </p>
 
-        <div class="bracket-scroll" aria-label="16-team elimination bracket; horizontally scrollable">
+        <div
+          class="bracket-scroll"
+          aria-label="16-team elimination bracket; horizontally scrollable"
+        >
           <div class="bracket bracket-16">
             <svg class="bracket-wires" aria-hidden="true"></svg>
 
-            ${roundColumn("BO1 Elimination", "16 teams · 8 matches", bo1Matches)}
-            ${roundColumn("BO3 Elimination", "8 teams · 4 matches", bo3Matches)}
+            ${roundColumn(
+              "BO1 Elimination",
+              "16 teams · 8 matches",
+              bo1Matches
+            )}
+
+            ${roundColumn(
+              "BO3 Elimination",
+              "8 teams · 4 matches",
+              bo3Matches
+            )}
 
             <section class="bracket-column playoffs-column">
-              <span class="round-subtitle">4 spots available</span>
+              <span class="round-subtitle">
+                4 spots available
+              </span>
+
               <h3 class="gold">Playoffs Qualified</h3>
 
               <div class="bracket-stack">
-                <div class="playoffs-box" aria-label="Four teams qualified for playoffs">
+                <div
+                  class="playoffs-box"
+                  aria-label="Four teams qualified for playoffs"
+                >
                   ${qualifiers}
                 </div>
               </div>
@@ -511,7 +571,10 @@ function bracketPage() {
           </div>
         </div>
 
-        <p class="stat-label">Elimination stage only / Scores and qualifiers will be updated after matches. Playoff rounds are not displayed here.</p>
+        <p class="stat-label">
+          Elimination stage only / Scores and qualifiers will be
+          updated after matches. Playoff rounds are not displayed here.
+        </p>
       </section>
 
       <section class="section">
@@ -524,7 +587,11 @@ function bracketPage() {
           <div class="card">
             <h3>October 28–November 1, 2026</h3>
             <p>The tournament begins October 28 at 9:00 PM NST. See the five-day schedule for provisional round windows.</p>
-            ${button("schedule.html", "View schedule", "btn btn-outline")}
+            ${button(
+              "schedule.html",
+              "View schedule",
+              "btn btn-outline"
+            )}
           </div>
         </div>
       </section>
@@ -540,10 +607,10 @@ function setupBracketWires() {
   const svg = bracket.querySelector(".bracket-wires");
   const NS = "http://www.w3.org/2000/svg";
 
-  // Connect BO1 matches into BO3 matches,
-  // then BO3 matches into Playoffs Qualified.
-
   const edges = [];
+
+  // BO1 winners connect to BO3 matches.
+  // BO3 winners connect to playoffs slots.
 
   for (let i = 0; i < 4; i++) {
     edges.push([
@@ -586,6 +653,7 @@ function setupBracketWires() {
       });
 
       const next = dest.getBoundingClientRect();
+
       const xEnd = next.left - root.left;
       const yEnd = next.top + next.height / 2 - root.top;
       const middle = (left[0].x + xEnd) / 2;
@@ -593,15 +661,29 @@ function setupBracketWires() {
       let d;
 
       if (left.length === 1) {
-        d = `M ${left[0].x} ${left[0].y} H ${middle} V ${yEnd} H ${xEnd}`;
+        d = `
+          M ${left[0].x} ${left[0].y}
+          H ${middle}
+          V ${yEnd}
+          H ${xEnd}
+        `;
       } else {
         const yMid = (left[0].y + left[1].y) / 2;
 
-        d = `M ${left[0].x} ${left[0].y} H ${middle} V ${left[1].y} H ${left[1].x} M ${middle} ${yMid} H ${xEnd} V ${yEnd}`;
+        d = `
+          M ${left[0].x} ${left[0].y}
+          H ${middle}
+          V ${left[1].y}
+          H ${left[1].x}
+          M ${middle} ${yMid}
+          H ${xEnd}
+          V ${yEnd}
+        `;
       }
 
       const path = document.createElementNS(NS, "path");
       path.setAttribute("d", d);
+
       svg.appendChild(path);
     }
   }
@@ -627,7 +709,9 @@ function resultsPage() {
       <section class="container">
         <div class="results-hero">
           <div class="results-copy">
-            <span class="results-status">⌛ The first round is still ahead</span>
+            <span class="results-status">
+              ⌛ The first round is still ahead
+            </span>
 
             <h2 style="font-size:clamp(38px,5vw,55px);margin-top:22px">
               NO SCORES YET.<br>ALL THE FIRE TO COME.
@@ -642,7 +726,11 @@ function resultsPage() {
 
             <div class="hero-actions">
               ${button("schedule.html", "View schedule")}
-              ${button(DISCORD_URL, "Follow on Discord", "btn btn-outline")}
+              ${button(
+                DISCORD_URL,
+                "Follow on Discord",
+                "btn btn-outline"
+              )}
             </div>
           </div>
 
@@ -741,7 +829,6 @@ function watchPage() {
       <section class="section section-alt">
         <div class="container">
           ${eyebrow("Your viewing checklist")}
-
           <h2>BE READY FOR FINALS NIGHT.</h2>
 
           <div class="grid-3" style="margin-top:25px">
@@ -779,7 +866,10 @@ function registerPage() {
 
       <div class="form-grid">
         <div class="field">
-          <label for="player${i + 1}">Player ${i + 1} Name *</label>
+          <label for="player${i + 1}">
+            Player ${i + 1} Name *
+          </label>
+
           <input
             id="player${i + 1}"
             name="Player ${i + 1} Name"
@@ -790,7 +880,10 @@ function registerPage() {
         </div>
 
         <div class="field">
-          <label for="riot${i + 1}">Player ${i + 1} Riot ID *</label>
+          <label for="riot${i + 1}">
+            Player ${i + 1} Riot ID *
+          </label>
+
           <input
             id="riot${i + 1}"
             name="Player ${i + 1} Riot ID"
@@ -804,6 +897,7 @@ function registerPage() {
           <label for="discord${i + 1}">
             Player ${i + 1} Discord username (optional)
           </label>
+
           <input
             id="discord${i + 1}"
             name="Player ${i + 1} Discord"
@@ -837,7 +931,9 @@ function registerPage() {
           >
 
           <section class="form-section">
-            <h2><span class="info-number">01</span> TEAM & CAPTAIN</h2>
+            <h2>
+              <span class="info-number">01</span> TEAM & CAPTAIN
+            </h2>
 
             <p>
               Required fields are marked *. The captain is the main
@@ -857,7 +953,10 @@ function registerPage() {
               </div>
 
               <div class="field">
-                <label for="captainName">Captain's player name *</label>
+                <label for="captainName">
+                  Captain's player name *
+                </label>
+
                 <input
                   id="captainName"
                   name="Captain Name"
@@ -871,6 +970,7 @@ function registerPage() {
                 <label for="captainDiscord">
                   Captain's Discord username *
                 </label>
+
                 <input
                   id="captainDiscord"
                   name="Captain Discord"
@@ -884,6 +984,7 @@ function registerPage() {
                 <label for="captainEmail">
                   Captain's email address *
                 </label>
+
                 <input
                   id="captainEmail"
                   type="email"
@@ -897,7 +998,9 @@ function registerPage() {
           </section>
 
           <section class="form-section">
-            <h2><span class="info-number">02</span> LOCK IN YOUR FIVE</h2>
+            <h2>
+              <span class="info-number">02</span> LOCK IN YOUR FIVE
+            </h2>
 
             <p>
               Five starting players are required. Enter each Riot ID,
@@ -918,7 +1021,10 @@ function registerPage() {
 
             <div class="form-grid">
               <div class="field">
-                <label for="subName">Substitute player name</label>
+                <label for="subName">
+                  Substitute player name
+                </label>
+
                 <input
                   id="subName"
                   name="Substitute Name"
@@ -928,7 +1034,10 @@ function registerPage() {
               </div>
 
               <div class="field">
-                <label for="subRiot">Substitute Riot ID</label>
+                <label for="subRiot">
+                  Substitute Riot ID
+                </label>
+
                 <input
                   id="subRiot"
                   name="Substitute Riot ID"
@@ -941,6 +1050,7 @@ function registerPage() {
                 <label for="subDiscord">
                   Substitute Discord username
                 </label>
+
                 <input
                   id="subDiscord"
                   name="Substitute Discord"
@@ -952,7 +1062,9 @@ function registerPage() {
           </section>
 
           <section class="form-section">
-            <h2><span class="info-number">03</span> BEFORE YOU SUBMIT</h2>
+            <h2>
+              <span class="info-number">03</span> BEFORE YOU SUBMIT
+            </h2>
 
             <p>
               Read the full official tournament rules on Discord
@@ -966,6 +1078,7 @@ function registerPage() {
                 value="Confirmed"
                 required
               >
+
               <span>
                 I confirm all players on this roster meet the
                 tournament's Nepali-player eligibility requirement. *
@@ -979,13 +1092,16 @@ function registerPage() {
                 value="Accepted"
                 required
               >
+
               <span>
                 I have read and agree to the official tournament
                 rules shared on Discord. *
               </span>
             </label>
 
-            <p class="gold">Free entry. No payment required.</p>
+            <p class="gold">
+              Free entry. No payment required.
+            </p>
 
             <button class="btn" type="submit">
               Submit Team Registration ↗
@@ -1000,14 +1116,18 @@ function registerPage() {
             ></div>
 
             <p style="font-size:11px; margin-top:15px">
-              Registration is closed. The form is kept here for reference; new submissions are disabled.
+              Registration is closed. The form is kept here for
+              reference; new submissions are disabled.
             </p>
           </section>
         </form>
 
         <aside class="sidebar-sticky">
           <div class="side-card">
-            <span class="card-kicker">● Entries closed October 26</span>
+            <span class="card-kicker">
+              ● Entries closed October 26
+            </span>
+
             <h2>REGISTRATION CLOSED.</h2>
             <p>रू 21,000 total prize pool</p>
 
@@ -1070,7 +1190,12 @@ function setupNavigation() {
 
   toggle.addEventListener("click", () => {
     const isOpen = nav.classList.toggle("open");
-    toggle.setAttribute("aria-expanded", String(isOpen));
+
+    toggle.setAttribute(
+      "aria-expanded",
+      String(isOpen)
+    );
+
     toggle.textContent = isOpen ? "✕ Close" : "☰ Menu";
   });
 }
@@ -1082,12 +1207,15 @@ function setupScheduleFilters() {
   buttons.forEach(button => {
     button.addEventListener("click", () => {
       buttons.forEach(item => item.classList.remove("active"));
+
       button.classList.add("active");
 
       const selected = button.dataset.filter;
 
       rows.forEach(row => {
-        row.hidden = selected !== "all" && row.dataset.day !== selected;
+        row.hidden =
+          selected !== "all" &&
+          row.dataset.day !== selected;
       });
     });
   });
@@ -1103,40 +1231,51 @@ function setupRegistration() {
   if (REGISTRATION_CLOSED) {
     form.classList.add("registration-closed");
 
-    form.querySelectorAll("input, button[type=submit]").forEach(control => {
+    form.querySelectorAll(
+      "input, button[type=submit]"
+    ).forEach(control => {
       control.disabled = true;
     });
 
-    const submit = form.querySelector('button[type="submit"]');
+    const submit = form.querySelector(
+      'button[type="submit"]'
+    );
 
     if (submit) {
       submit.textContent = "Registration closed";
     }
 
     message.hidden = false;
+
     message.textContent =
       "Registration closed on October 26, 2026. New team submissions are no longer accepted.";
 
-    form.addEventListener("submit", event => event.preventDefault());
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+    });
+
     return;
   }
 
   form.addEventListener("submit", event => {
-    const subName = document.getElementById("subName").value.trim();
-    const subRiot = document.getElementById("subRiot").value.trim();
-    const subDiscord = document.getElementById("subDiscord").value.trim();
+    const subName = document
+      .getElementById("subName").value.trim();
+
+    const subRiot = document
+      .getElementById("subRiot").value.trim();
+
+    const subDiscord = document
+      .getElementById("subDiscord").value.trim();
 
     const hasSubstitute = Boolean(
       subName || subRiot || subDiscord
     );
 
-    // If any substitute detail is entered, require
-    // the substitute name and Riot ID.
-
     if (hasSubstitute && (!subName || !subRiot)) {
       event.preventDefault();
 
       message.hidden = false;
+
       message.textContent =
         "Please enter the substitute's player name and Riot ID, " +
         "or clear all substitute fields.";
@@ -1154,7 +1293,10 @@ function setupRegistration() {
 function init() {
   const renderPage = renderers[currentPage] || homePage;
 
-  app.innerHTML = header() + renderPage() + footer();
+  app.innerHTML =
+    header() +
+    renderPage() +
+    footer();
 
   setupNavigation();
   setupScheduleFilters();
