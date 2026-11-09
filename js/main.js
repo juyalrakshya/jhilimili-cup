@@ -47,7 +47,7 @@ function header() {
         <a class="brand" href="index.html" aria-label="Jhilimili Cup home">
           <span class="brand-symbol" aria-hidden="true">♜</span>
           <span>
-            <span class="brand-name">JHILI-MILI CUP</span>
+            <span class="brand-name">JHILI-MILI VALORANT TOURNAMENT CUP</span>
             <span class="brand-sub">VALORANT · NEPAL · 2026</span>
           </span>
         </a>
@@ -78,7 +78,7 @@ function footer() {
             <a class="brand" href="index.html">
               <span class="brand-symbol" aria-hidden="true">♜</span>
               <span>
-                <span class="brand-name">JHILI-MILI CUP</span>
+                <span class="brand-name">JHILI-MILI VALORANT TOURNAMENT CUP</span>
                 <span class="brand-sub">VALORANT · NEPAL · 2026</span>
               </span>
             </a>
@@ -154,21 +154,37 @@ function stats() {
 function homePage() {
   return `
     <main>
-      <section class="hero">
-        <div class="container hero-inner">
-          <div class="hero-copy">
-            ${eyebrow("This Tihar, Nepal plays together")}
-            <h1>JHILI-MILI <span>CUP</span></h1>
-            <p class="gold">VALORANT / NEPAL / 2026</p>
-            <p class="lead">Light up the server. Play for your people. Five nights. One champion. A Tihar to remember.</p>
-            <div class="hero-actions">
-              ${button("register.html", "Registration closed")}
-              ${button(DISCORD_URL, "Join Discord", "btn btn-outline")}
-            </div>
-            <p class="hero-note">✦ REGISTRATION CLOSED &nbsp; Closed October 26</p>
-          </div>
-        </div>
-      </section>
+      
+<section class="hero">
+  <div class="container hero-inner">
+    <div class="hero-copy">
+      ${eyebrow("This Tihar, Nepal plays together")}
+
+      <h1 class="hero-main-title">
+        JHILI-MILI VALORANT
+        <span>TOURNAMENT CUP</span>
+      </h1>
+
+      <p class="gold">VALORANT / NEPAL / 2026
+     <span>Light up the server. Play for your people.
+        Five nights. One champion. A Tihar to remember.</span>
+       
+      </p>
+
+      
+
+      <div class="hero-actions">
+        ${button("register.html", "Registration closed")}
+        ${button(DISCORD_URL, "Join Discord", "btn btn-outline")}
+      </div>
+
+      <p class="hero-note">
+        ✦ REGISTRATION CLOSED &nbsp; Closed October 26
+      </p>
+    </div>
+  </div>
+</section>
+
 
       ${stats()}
 
