@@ -1,4 +1,3 @@
-
 "use strict";
 
 const DISCORD_URL = "https://discord.gg/Stzt94CTpu";
@@ -144,7 +143,7 @@ function stats() {
       <div class="container stats-grid">
         <div class="stat"><span class="stat-label">Prize pool</span><div class="stat-value gold">रू 21,000</div></div>
         <div class="stat"><span class="stat-label">Opening night</span><div class="stat-value">OCT 28 · 9 PM</div></div>
-        <div class="stat"><span class="stat-label">The format</span><div class="stat-value">5V5 · BO1 / BO3</div></div>
+        <div class="stat"><span class="stat-label">The format</span><div class="stat-value">5V5 · BO1</div></div>
         <div class="stat"><span class="stat-label">The server</span><div class="stat-value">MUMBAI</div></div>
         <div class="stat"><span class="stat-label">Eligibility</span><div class="stat-value">NEPALI PLAYERS</div></div>
       </div>
@@ -183,7 +182,7 @@ function homePage() {
           </div>
           <ul class="info-list">
             <li><span class="info-number">01</span><div><strong>Five together</strong><p>Bring five starting players. Add an optional sixth as your substitute.</p></div></li>
-            <li><span class="info-number">02</span><div><strong>Every round matters</strong><p>BO1 opening matches, followed by BO3 eliminations. One loss ends the run.</p></div></li>
+            <li><span class="info-number">02</span><div><strong>Every round matters</strong><p>Best-of-one matches. Single elimination. No second chances.</p></div></li>
             <li><span class="info-number">03</span><div><strong>Our home. Our stage.</strong><p>Nepali players only, competing on the Mumbai server.</p></div></li>
           </ul>
         </div>
@@ -227,7 +226,7 @@ function homePage() {
           <div>
             ${eyebrow("04 / The road is single elimination")}
             <h2>ONE LOSS ENDS IT.<br>ONE TEAM TAKES IT.</h2>
-            <p>BO1 opening matches lead into BO3 elimination matches. Follow the 16-team draw through the four playoffs qualification spots.</p>
+            <p>Every match is BO1. Follow the path from the first elimination to the final. The 16-team opening draw is now available.</p>
             ${button("bracket.html", "Explore the bracket", "btn btn-outline")}
           </div>
           <div class="card">
@@ -284,7 +283,7 @@ function homePage() {
 function infoPage() {
   const items = [
     ["01", "Eligibility", "Nepali players ONLY", "A tournament for Nepal's VALORANT community."],
-    ["02", "Match format", "5v5 · BO1 then BO3 · Single elimination", "Five starting players, with an optional sixth substitute."],
+    ["02", "Match format", "5v5 · BO1 · Single elimination", "Five starting players, with an optional sixth substitute."],
     ["03", "Server", "Mumbai", "All tournament matches use the Mumbai server."],
     ["04", "Start time", "October 28, 2026 · 9:00 PM NST", "NST means Nepal Standard Time (UTC+5:45)."],
     ["05", "Event window", "October 28–November 1, 2026", "Five consecutive days progressing toward the finals."],
@@ -300,8 +299,8 @@ function infoPage() {
           <div class="feature-panel">
             <div class="card-kicker">VALORANT / COMPETITIVE</div>
             <div class="big-format">5V5</div>
-            <h3>ONE CHANCE.<br>FIGHT FOR PLAYOFFS.</h3>
-            <p>The opening elimination matches are BO1, followed by four BO3 matches. Each BO3 winner qualifies for playoffs.</p>
+            <h3>ONE MAP.<br>NO SECOND CHANCES.</h3>
+            <p>Best-of-one matches in a single-elimination tournament. A match loss ends your championship run.</p>
           </div>
           <ul class="info-list">
             ${items.map(([n, label, value, desc]) => `
@@ -336,7 +335,7 @@ const scheduleDays = [
   { day: 1, date: "28", month: "OCT", weekday: "WED", title: "Opening night", desc: "The first step on the road to the Cup.", round: "Opening matches" },
   { day: 2, date: "29", month: "OCT", weekday: "THU", title: "The climb continues", desc: "Survive the night. Stay in the race.", round: "Elimination rounds" },
   { day: 3, date: "30", month: "OCT", weekday: "FRI", title: "The field narrows", desc: "The championship path gets tighter.", round: "Later elimination rounds" },
-  { day: 4, date: "31", month: "OCT", weekday: "SAT", title: "Finals in sight", desc: "A place on the final stage is within reach.", round: "Playoffs window" },
+  { day: 4, date: "31", month: "OCT", weekday: "SAT", title: "Finals in sight", desc: "A place on the final stage is within reach.", round: "Semifinals window" },
   { day: 5, date: "01", month: "NOV", weekday: "SUN", title: "Finals night", desc: "One team leaves as Jhilimili Cup champion.", round: "Championship final" }
 ];
 
@@ -377,37 +376,18 @@ function schedulePage() {
   `;
 }
 
-// ======================================================
-// BRACKET RESULTS AND PROGRESSION
-// ======================================================
 
-// BO1 winners from your latest reference image.
-// No scores have been invented.
-//
-// To update a BO3 match later, add its winner to
-// BRACKET_WINNERS, or its actual map score to
-// BRACKET_SCORES.
-//
-// Example: "BO3-1": [2, 1] means the first team
-// won two maps and the second team won one map.
 
-const BRACKET_WINNERS = {
-  "BO1-1": "RAZE THE ROOF",
-  "BO1-2": "LOADSHEDDING",
-  "BO1-3": "AUTUMN",
-  "BO1-4": "BATTI BALYO",
-  "BO1-5": "NIGGLE",
-  "BO1-6": "FORFETIC",
-  "BO1-7": "PROPHETIC",
-  "BO1-8": "KHUWASAS"
-};
+/* ==========================================
+   JHILI-MILI CUP — UPDATED TOURNAMENT BRACKET
+========================================== */
 
-const BRACKET_SCORES = {
-  // Add real scores here when available.
-  // BO1 scores = rounds won.
-  // BO3 scores = maps won.
-};
 
+/* ==========================================
+   JHILI-MILI CUP — FINAL TOURNAMENT BRACKET
+========================================== */
+
+// Opening round — 16 teams
 const OPENING_MATCHUPS = [
   ["RAZE THE ROOF", "ETERNITY"],
   ["LOADSHEDDING", "ZENO"],
@@ -419,408 +399,799 @@ const OPENING_MATCHUPS = [
   ["RSP", "KHUWASAS"]
 ];
 
-function buildBracketMatch(id, teams, format) {
-  const scores = BRACKET_SCORES[id];
+// Opening-round winners
+const OPENING_WINNERS = {
+  1: "RAZE THE ROOF",
+  2: "LOADSHEDDING",
+  3: "AUTUMN",
+  4: "BATTI BALYO",
+  5: "NIGGLE",
+  6: "FORFETIC",
+  7: "PROPHETIC",
+  8: "KHUWASAS"
+};
 
-  const valid =
-    Array.isArray(scores) &&
-    scores.length === 2 &&
-    scores.every(n => Number.isInteger(n) && n >= 0) &&
-    scores[0] !== scores[1] &&
-    (
-      format === "BO1" ||
-      (Math.max(...scores) === 2 && Math.min(...scores) <= 1)
-    ) &&
-    teams.every(t => t && !t.startsWith("Winner "));
+// Quarter-finals
+const QUARTER_FINALS = [
+  {
+    teams: ["RAZE THE ROOF", "LOADSHEDDING"],
+    winner: "RAZE THE ROOF"
+  },
+  {
+    teams: ["AUTUMN", "BATTI BALYO"],
+    winner: "BATTI BALYO"
+  },
+  {
+    teams: ["NIGGLE", "FORFETIC"],
+    winner: "FORFETIC"
+  },
+  {
+    teams: ["PROPHETIC", "KHUWASAS"],
+    winner: "PROPHETIC"
+  }
+];
 
-  const scoreWinner = valid
-    ? teams[scores[0] > scores[1] ? 0 : 1]
-    : null;
+// Semi-finals
+const SEMIFINALS = [
+  {
+    teams: ["RAZE THE ROOF", "BATTI BALYO"],
+    winner: "BATTI BALYO",
+    note: "Batti Balyo advances to the Grand Final"
+  },
+  {
+    teams: ["FORFETIC", "PROPHETIC"],
+    winner: "PROPHETIC",
+    note: "Prophetic advances to the Grand Final"
+  }
+];
 
-  const listedWinner = BRACKET_WINNERS[id];
+// Third-place match
+const THIRD_PLACE_MATCH = {
+  teams: ["RAZE THE ROOF", "FORFETIC"],
+  winner: "RAZE THE ROOF",
+  note: "Raze the Roof finishes in 3rd place"
+};
 
-  const winner = scoreWinner ||
-    (teams.includes(listedWinner) ? listedWinner : null);
+// Grand final
+const GRAND_FINAL = {
+  teams: ["BATTI BALYO", "PROPHETIC"],
+  scores: [3, 2],
+  winner: "BATTI BALYO",
+  note: "Batti Balyo becomes Jhilimili Cup 2026 Champion"
+};
 
-  return {
-    id,
-    teams,
-    format,
-    scores: valid ? scores : null,
-    winner
-  };
+// Final tournament standings
+const FINAL_STANDINGS = [
+  {
+    position: "01",
+    title: "CHAMPION",
+    team: "BATTI BALYO",
+    prize: "रू 12,500"
+  },
+  {
+    position: "02",
+    title: "RUNNER-UP",
+    team: "PROPHETIC",
+    prize: "रू 5,000"
+  },
+  {
+    position: "03",
+    title: "THIRD PLACE",
+    team: "RAZE THE ROOF",
+    prize: "रू 2,500"
+  }
+];
+
+
+/* ==========================================
+   BRACKET COMPONENTS
+========================================== */
+
+function simpleMatchCard(teams, winner = null, round = "") {
+  return `
+    <article class="tournament-match">
+
+      ${round ? `
+        <div class="tournament-match-header">
+          ${round}
+        </div>
+      ` : ""}
+
+      <div class="tournament-match-teams">
+
+        ${teams.map(team => `
+          <div class="tournament-team ${team === winner ? "is-winner" : ""}">
+            <span>${team}</span>
+
+            ${team === winner
+              ? '<span class="winner-mark">✦</span>'
+              : ""}
+          </div>
+        `).join("")}
+
+      </div>
+    </article>
+  `;
 }
 
-function bracketPage() {
-  const bo1Matches = OPENING_MATCHUPS.map((teams, i) =>
-    buildBracketMatch(`BO1-${i + 1}`, teams, "BO1")
-  );
 
-  const bo3Matches = Array.from({ length: 4 }, (_, i) => {
-    const first = bo1Matches[i * 2];
-    const second = bo1Matches[i * 2 + 1];
+function playoffMatchCard(match, round, scores = null) {
+  return `
+    <article class="tournament-match playoff-match">
 
-    return buildBracketMatch(`BO3-${i + 1}`, [
-      first.winner || `Winner ${first.id}`,
-      second.winner || `Winner ${second.id}`
-    ], "BO3");
+      <div class="tournament-match-header">
+        ${round}
+      </div>
+
+      <div class="tournament-match-teams">
+
+        ${match.teams.map((team, index) => `
+          <div class="tournament-team ${team === match.winner ? "is-winner" : ""}">
+
+            <span>${team}</span>
+
+            <strong class="team-score">
+              ${scores ? scores[index] : ""}
+            </strong>
+
+          </div>
+        `).join("")}
+
+      </div>
+
+      <div class="match-result-note">
+        ${match.note}
+      </div>
+
+    </article>
+  `;
+}
+
+
+function standingsCard() {
+  return `
+    <div class="final-standings-grid">
+
+      ${FINAL_STANDINGS.map((item, index) => `
+        <article class="standing-card standing-${index + 1}">
+
+          <span class="standing-position">
+            ${item.position}
+          </span>
+
+          <span class="standing-title">
+            ${item.title}
+          </span>
+
+          <h3>${item.team}</h3>
+
+          <span class="standing-prize">
+            ${item.prize}
+          </span>
+
+        </article>
+      `).join("")}
+
+    </div>
+  `;
+}
+
+/* ==========================================
+   TOURNAMENT POINTS SYSTEM
+   Each game  win = 2 points
+========================================== */
+
+function getTournamentPoints() {
+  // Start every team at zero points.
+  const points = {};
+
+  OPENING_MATCHUPS.flat().forEach(team => {
+    points[team] = 0;
   });
 
-  const matchCard = match => `
-    <div class="match" data-bracket-match="${match.id}">
-      <div class="match-header">
-        <span>Match ${match.id.split("-")[1].padStart(2, "0")}</span>
-        <span>${match.format}</span>
-      </div>
+  // Award 2 points for every match won.
+  function awardPoints(team) {
+    if (points[team] !== undefined) {
+      points[team] += 2;
+    }
+  }
 
-      ${match.teams.map((team, i) => `
-        <div class="team-slot ${team.startsWith("Winner ") ? "pending" : ""} ${match.winner === team ? "winner" : ""}">
-          <span>${team}</span>
-          <span class="team-score">
-            ${match.scores ? match.scores[i] : "—"}
-          </span>
-        </div>
-      `).join("")}
-    </div>
-  `;
+  // Opening-round winners
+  Object.values(OPENING_WINNERS).forEach(awardPoints);
 
-  const roundColumn = (name, subtitle, matches) => `
-    <section class="bracket-column">
-      <span class="round-subtitle">${subtitle}</span>
-      <h3>${name}</h3>
+  // Quarter-final winners
+  QUARTER_FINALS.forEach(match => {
+    awardPoints(match.winner);
+  });
 
-      <div class="bracket-stack">
-        ${matches.map(matchCard).join("")}
-      </div>
-    </section>
-  `;
+  // Semi-final winners
+  SEMIFINALS.forEach(match => {
+    awardPoints(match.winner);
+  });
 
-  const qualifiers = bo3Matches.map((match, i) => `
-    <div
-      class="playoffs-slot ${match.winner ? "qualified" : "pending"}"
-      data-bracket-match="PLAYOFF-${i + 1}"
-    >
-      <span class="playoffs-slot-number">0${i + 1}</span>
-      <span>${match.winner || "TBD"}</span>
-    </div>
-  `).join("");
+  // Third-place match winner
+  awardPoints(THIRD_PLACE_MATCH.winner);
+
+  // Grand-final winner
+  awardPoints(GRAND_FINAL.winner);
+
+  // Work out each team's final tournament status.
+  function getTeamStatus(team) {
+    const finalPosition = FINAL_STANDINGS.find(
+      item => item.team === team
+    );
+
+    if (finalPosition) {
+      return finalPosition.title;
+    }
+
+    if (THIRD_PLACE_MATCH.teams.includes(team)) {
+      return team === THIRD_PLACE_MATCH.winner
+        ? "3RD PLACE"
+        : "4TH PLACE";
+    }
+
+    const semiFinal = SEMIFINALS.find(
+      match => match.teams.includes(team)
+    );
+
+    if (semiFinal && semiFinal.winner !== team) {
+      return "SEMI-FINAL";
+    }
+
+    const quarterFinal = QUARTER_FINALS.find(
+      match => match.teams.includes(team)
+    );
+
+    if (quarterFinal && quarterFinal.winner !== team) {
+      return "QUARTER-FINAL";
+    }
+
+    return "OPENING ROUND";
+  }
+
+  // Create the leaderboard.
+  return Object.entries(points)
+    .map(([team, total]) => ({
+      team,
+      points: total,
+      status: getTeamStatus(team)
+    }))
+    .sort((a, b) => {
+      // Highest points first.
+      if (b.points !== a.points) {
+        return b.points - a.points;
+      }
+
+      // Use final placement to break ties between podium teams.
+      const rankA = FINAL_STANDINGS.findIndex(
+        item => item.team === a.team
+      );
+
+      const rankB = FINAL_STANDINGS.findIndex(
+        item => item.team === b.team
+      );
+
+      if (rankA !== -1 || rankB !== -1) {
+        if (rankA === -1) return 1;
+        if (rankB === -1) return -1;
+        return rankA - rankB;
+      }
+
+      // Otherwise preserve the original opening-round order.
+      return OPENING_MATCHUPS.flat().indexOf(a.team) -
+        OPENING_MATCHUPS.flat().indexOf(b.team);
+    });
+}
+
+
+/* ==========================================
+   TOURNAMENT POINTS TABLE
+========================================== */
+
+function pointsTable() {
+  const teams = getTournamentPoints();
 
   return `
-    <main>
+    <div class="points-table-wrapper">
+
+      <table class="points-table">
+
+        <thead>
+          <tr>
+            <th>TEAM</th>
+            <th>POINTS</th>
+            <th>FINAL STATUS</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          ${teams.map((item, index) => `
+            <tr class="${index < 3 ? "points-top-three" : ""}">
+
+              <td>
+                <span class="points-team">
+                  ${item.team}
+                </span>
+              </td>
+
+              <td>
+                <strong class="points-value">
+                  ${item.points}
+                </strong>
+              </td>
+
+              <td>
+                <span class="points-status">
+                  ${item.status}
+                </span>
+              </td>
+
+            </tr>
+          `).join("")}
+        </tbody>
+
+      </table>
+
+    </div>
+  `;
+}
+
+
+/* ==========================================
+   BRACKET PAGE
+========================================== */
+
+function bracketPage() {
+  return `
+    <main class="tournament-page">
+
       ${pageHero(
-        "Elimination stage / 16 teams",
-        "THE ROAD TO PLAYOFFS.",
-        "Eight BO1 opening matches lead to four BO3 elimination matches. Each BO3 winner earns one of the four Playoffs Qualified spots. Scores and advancing teams will be updated after each game."
+        "Jhilimili Cup 2026 / Tournament progression",
+        "THE ROAD TO THE CHAMPION.",
+        "Follow every stage of the tournament, from the opening 16-team draw to the Grand Final. Congratulations to our final three teams."
       )}
 
-      <section class="container">
-        <div class="notice">
-          <strong>✦ Opening bracket confirmed · 16 teams</strong>
-          <p>The eight BO1 winners are shown in the four BO3 matchups, matching the organiser's latest bracket. The four playoff qualifiers will be shown after the BO3 results are confirmed.</p>
+
+      <!-- OPENING ROUND -->
+
+      <section class="container tournament-round-section">
+
+        <div class="tournament-section-heading">
+          ${eyebrow("ROUND 01 / 16 TEAMS")}
+
+          <h2>THE OPENING ROUND</h2>
+
+          <p>Eight matchups. Eight teams advance.</p>
         </div>
 
-        <div class="section-heading">
-          <span class="card-kicker">
-            ● 16 teams → 8 winners → 4 playoffs qualifiers
-          </span>
+        <div class="opening-match-grid">
 
-          <span class="stat-label">
-            BO1 elimination → BO3 elimination · Mumbai server
-          </span>
+          ${OPENING_MATCHUPS.map((teams, index) =>
+            simpleMatchCard(
+              teams,
+              OPENING_WINNERS[index + 1],
+              `MATCH ${String(index + 1).padStart(2, "0")}`
+            )
+          ).join("")}
+
         </div>
 
-        <p class="bracket-hint">
-          ← Swipe or scroll sideways to view all three stages →
-        </p>
+      </section>
 
-        <div
-          class="bracket-scroll"
-          aria-label="16-team elimination bracket; horizontally scrollable"
-        >
-          <div class="bracket bracket-16">
-            <svg class="bracket-wires" aria-hidden="true"></svg>
 
-            ${roundColumn(
-              "BO1 Elimination",
-              "16 teams · 8 matches",
-              bo1Matches
+      <!-- QUARTER-FINALS -->
+
+      <section class="section section-alt">
+
+        <div class="container tournament-round-section">
+
+          <div class="tournament-section-heading">
+            ${eyebrow("ROUND 02 / 8 TEAMS")}
+
+            <h2>THE QUARTER-FINALS</h2>
+
+            <p>Four matchups. Four semi-finalists.</p>
+          </div>
+
+          <div class="quarter-final-grid">
+
+            ${QUARTER_FINALS.map((match, index) =>
+              simpleMatchCard(
+                match.teams,
+                match.winner,
+                `QUARTER-FINAL ${index + 1}`
+              )
+            ).join("")}
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- SEMI-FINALS -->
+
+      <section class="container tournament-round-section">
+
+        <div class="tournament-section-heading">
+          ${eyebrow("ROUND 03 / 4 TEAMS")}
+
+          <h2>THE SEMI-FINALS</h2>
+
+          <p>Two battles. Two places in the Grand Final.</p>
+        </div>
+
+        <div class="playoff-grid">
+
+          ${SEMIFINALS.map((match, index) =>
+            playoffMatchCard(
+              match,
+              `SEMI-FINAL ${index + 1}`
+            )
+          ).join("")}
+
+        </div>
+
+      </section>
+
+
+      <!-- THIRD PLACE -->
+
+      <section class="section section-alt">
+
+        <div class="container tournament-round-section">
+
+          <div class="tournament-section-heading">
+            ${eyebrow("THE PLACEMENT MATCH")}
+
+            <h2>THE THIRD-PLACE SHOWDOWN</h2>
+
+            <p>One final battle for a place on the podium.</p>
+          </div>
+
+          <div class="special-match-container">
+
+            ${playoffMatchCard(
+              THIRD_PLACE_MATCH,
+              "THIRD-PLACE MATCH"
             )}
 
-            ${roundColumn(
-              "BO3 Elimination",
-              "8 teams · 4 matches",
-              bo3Matches
-            )}
+            <div class="placement-result">
+              <span class="placement-icon">✦</span>
 
-            <section class="bracket-column playoffs-column">
-              <span class="round-subtitle">
-                4 spots available
-              </span>
-
-              <h3 class="gold">Playoffs Qualified</h3>
-
-              <div class="bracket-stack">
-                <div
-                  class="playoffs-box"
-                  aria-label="Four teams qualified for playoffs"
-                >
-                  ${qualifiers}
-                </div>
+              <div>
+                <span class="stat-label">THIRD-PLACE WINNER</span>
+                <h3>RAZE THE ROOF</h3>
+                <p>Secures third place in Jhilimili Cup 2026.</p>
               </div>
-            </section>
+            </div>
+
           </div>
+
         </div>
 
-        <p class="stat-label">
-          Elimination stage only / Scores and qualifiers will be
-          updated after matches. Playoff rounds are not displayed here.
-        </p>
       </section>
 
-      <section class="section">
-        <div class="container grid-2">
-          <div class="card">
-            <h3>03 · Third place</h3>
-            <p>रू 2,500. Placement-match format and scheduling are provisional, awaiting organiser confirmation.</p>
-          </div>
 
-          <div class="card">
-            <h3>October 28–November 1, 2026</h3>
-            <p>The tournament begins October 28 at 9:00 PM NST. See the five-day schedule for provisional round windows.</p>
-            ${button(
-              "schedule.html",
-              "View schedule",
-              "btn btn-outline"
-            )}
-          </div>
+      <!-- GRAND FINAL -->
+
+      <section class="container tournament-round-section grand-final-section">
+
+        <div class="tournament-section-heading">
+          ${eyebrow("THE FINAL / CHAMPIONSHIP MATCH")}
+
+          <h2>THE GRAND FINAL</h2>
+
+          <p>Two teams. One trophy. One champion.</p>
         </div>
+
+        <div class="grand-final-card">
+
+          <div class="grand-final-label">
+            <span>✦</span>
+            JHILI-MILI CUP 2026
+            <span>✦</span>
+          </div>
+
+          <div class="grand-final-teams">
+
+            ${GRAND_FINAL.teams.map((team, index) => `
+              <div class="grand-final-team ${team === GRAND_FINAL.winner ? "grand-final-winner" : ""}">
+
+                <span class="final-team-name">${team}</span>
+
+                <strong class="final-score">
+                  ${GRAND_FINAL.scores[index]}
+                </strong>
+
+                ${team === GRAND_FINAL.winner
+                  ? '<span class="champion-label">✦ CHAMPION</span>'
+                  : '<span class="runner-up-label">RUNNER-UP</span>'}
+
+              </div>
+            `).join("")}
+
+          </div>
+
+          <div class="grand-final-result">
+            <span class="trophy-symbol">♜</span>
+
+            <span class="stat-label">YOUR JHILIMILI CUP 2026 CHAMPIONS</span>
+
+            <h2>BATTI BALYO</h2>
+
+            <p>${GRAND_FINAL.note}</p>
+
+          </div>
+
+        </div>
+
       </section>
+
+
+      <!-- FINAL STANDINGS -->
+
+      <section class="section section-alt">
+
+        <div class="container tournament-round-section">
+
+          <div class="tournament-section-heading">
+            ${eyebrow("THE FINAL LEADERBOARD")}
+
+            <h2>THE PODIUM.</h2>
+
+            <p>Three teams. Three places in the history of the Cup.</p>
+          </div>
+
+          ${standingsCard()}
+
+        </div>
+
+      </section>
+
     </main>
   `;
 }
 
+
+/* ==========================================
+   BRACKET SETUP
+========================================== */
+
 function setupBracketWires() {
-  const bracket = document.querySelector(".bracket-16");
 
-  if (!bracket) return;
-
-  const svg = bracket.querySelector(".bracket-wires");
-  const NS = "http://www.w3.org/2000/svg";
-
-  const edges = [];
-
-  // BO1 winners connect to BO3 matches.
-  // BO3 winners connect to playoffs slots.
-
-  for (let i = 0; i < 4; i++) {
-    edges.push([
-      [`BO1-${i * 2 + 1}`, `BO1-${i * 2 + 2}`],
-      `BO3-${i + 1}`
-    ]);
-
-    edges.push([
-      [`BO3-${i + 1}`],
-      `PLAYOFF-${i + 1}`
-    ]);
-  }
-
-  function draw() {
-    const root = bracket.getBoundingClientRect();
-    const width = bracket.offsetWidth;
-    const height = bracket.offsetHeight;
-
-    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
-    svg.replaceChildren();
-
-    for (const [sourceIds, destId] of edges) {
-      const targets = sourceIds.map(id =>
-        bracket.querySelector(`[data-bracket-match="${id}"]`)
-      );
-
-      const dest = bracket.querySelector(
-        `[data-bracket-match="${destId}"]`
-      );
-
-      if (targets.some(el => !el) || !dest) continue;
-
-      const left = targets.map(el => {
-        const b = el.getBoundingClientRect();
-
-        return {
-          x: b.right - root.left,
-          y: b.top + b.height / 2 - root.top
-        };
-      });
-
-      const next = dest.getBoundingClientRect();
-
-      const xEnd = next.left - root.left;
-      const yEnd = next.top + next.height / 2 - root.top;
-      const middle = (left[0].x + xEnd) / 2;
-
-      let d;
-
-      if (left.length === 1) {
-        d = `
-          M ${left[0].x} ${left[0].y}
-          H ${middle}
-          V ${yEnd}
-          H ${xEnd}
-        `;
-      } else {
-        const yMid = (left[0].y + left[1].y) / 2;
-
-        d = `
-          M ${left[0].x} ${left[0].y}
-          H ${middle}
-          V ${left[1].y}
-          H ${left[1].x}
-          M ${middle} ${yMid}
-          H ${xEnd}
-          V ${yEnd}
-        `;
-      }
-
-      const path = document.createElementNS(NS, "path");
-      path.setAttribute("d", d);
-
-      svg.appendChild(path);
-    }
-  }
-
-  draw();
-
-  window.addEventListener("resize", draw);
-
-  if (document.fonts) {
-    document.fonts.ready.then(draw);
-  }
 }
+
+
+/* ==========================================
+   RESULTS PAGE
+========================================== */
 
 function resultsPage() {
   return `
     <main>
+
       ${pageHero(
-        "Results / The story so far",
-        "THE GLORY IS STILL UP FOR GRABS.",
-        "Jhilimili Cup has not started yet. No wins, no losses, no champions — just five nights of possibility ahead."
+        "Results / Jhilimili Cup 2026",
+        "THE CHAMPIONS HAVE RISEN.",
+        "The tournament journey is complete. Celebrate the teams who made it to the final podium."
       )}
 
+
       <section class="container">
+
         <div class="results-hero">
+
           <div class="results-copy">
+
             <span class="results-status">
-              ⌛ The first round is still ahead
+              ✦ TOURNAMENT COMPLETED
             </span>
 
             <h2 style="font-size:clamp(38px,5vw,55px);margin-top:22px">
-              NO SCORES YET.<br>ALL THE FIRE TO COME.
+              ONE CUP.<br>ONE CHAMPION.
             </h2>
 
-            <p>Match results will appear once play begins. Final standings and the tournament MVP will be announced after the competition.</p>
+            <p>
+              Congratulations to Batti Balyo, champions of Jhilimili Cup 2026.
+              Thank you to every team and player who took part in the tournament.
+            </p>
 
             <hr style="border:0;border-top:1px solid var(--border);margin:24px 0">
 
-            <span class="stat-label">Opening night</span>
-            <h3 class="gold">OCTOBER 28, 2026 · 9:00 PM NST</h3>
+            <span class="stat-label">GRAND FINAL RESULT</span>
+
+            <h3 class="gold">BATTI BALYO 3 – 2 PROPHETIC</h3>
 
             <div class="hero-actions">
-              ${button("schedule.html", "View schedule")}
-              ${button(
-                DISCORD_URL,
-                "Follow on Discord",
-                "btn btn-outline"
-              )}
+              ${button("bracket.html", "View full tournament bracket")}
+              ${button(DISCORD_URL, "Visit tournament Discord", "btn btn-outline")}
             </div>
+
           </div>
 
-          <div class="results-art" aria-label="Decorative trophy symbol">
+          <div class="results-art" aria-label="Tournament trophy">
             <span>♜</span>
           </div>
+
         </div>
+
       </section>
 
+
+      <!-- FINAL STANDINGS -->
+
       <section class="section">
+
         <div class="container">
+
+          <div class="tournament-section-heading">
+            ${eyebrow("THE FINAL STANDINGS")}
+
+            <h2>THE WINNERS.</h2>
+
+            <p>Final tournament placements and announced prize awards.</p>
+          </div>
+
+          ${standingsCard()}
+
+        </div>
+
+      </section>
+
+      <!-- TOURNAMENT POINTS TABLE -->
+
+      <section class="section">
+
+        <div class="container">
+
+          <div class="tournament-section-heading">
+            ${eyebrow("MATCH WIN POINTS")}
+
+            <h2>THE TOURNAMENT LEADERBOARD.</h2>
+
+            <p>
+              Every match victory earns 2 points.
+              Teams keep their points even after elimination.
+            </p>
+          </div>
+
+          ${pointsTable()}
+
+          <p class="points-table-note">
+            Each completed match win = 2 points.
+            Points are cumulative throughout the tournament.
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <!-- GRAND FINAL SCORE -->
+
+      <section class="section section-alt">
+
+        <div class="container">
+
+          <div class="tournament-section-heading">
+            ${eyebrow("CHAMPIONSHIP MATCH")}
+
+            <h2>THE GRAND FINAL RESULT.</h2>
+
+            <p>Batti Balyo takes the championship with a 3–2 victory over Prophetic.</p>
+          </div>
+
+          <div class="grand-final-card">
+
+            <div class="grand-final-label">
+              ✦ GRAND FINAL · BO5 ✦
+            </div>
+
+            <div class="grand-final-teams">
+
+              ${GRAND_FINAL.teams.map((team, index) => `
+                <div class="grand-final-team ${team === GRAND_FINAL.winner ? "grand-final-winner" : ""}">
+
+                  <span class="final-team-name">${team}</span>
+
+                  <strong class="final-score">
+                    ${GRAND_FINAL.scores[index]}
+                  </strong>
+
+                  <span class="stat-label">
+                    ${team === GRAND_FINAL.winner ? "CHAMPION" : "RUNNER-UP"}
+                  </span>
+
+                </div>
+              `).join("")}
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- PRIZE POOL -->
+
+      <section class="section">
+
+        <div class="container">
+
           <div class="prize-total-row">
-            <h2>रू 21,000 WAITING TO BE WON.</h2>
-            <span class="stat-label">No standings published yet</span>
+
+            <h2>THE रू 21,000 PRIZE POOL.</h2>
+
+            <span class="stat-label">ANNOUNCED AWARDS</span>
+
           </div>
 
           ${prizes()}
+
         </div>
+
       </section>
+
+
+      <!-- COMMUNITY THANK YOU -->
 
       <section class="section section-alt">
-        <div class="container grid-3">
-          <article class="card">
-            <span class="info-number">01</span>
-            <h3>Match scores</h3>
-            <p>Awaiting the first match. See the bracket for the opening pairings.</p>
-          </article>
 
-          <article class="card">
-            <span class="info-number">02</span>
-            <h3>Final standings</h3>
-            <p>Champion, runner-up and third-place recipients are yet to be determined.</p>
-          </article>
+        <div class="container">
 
-          <article class="card">
-            <span class="info-number">03</span>
-            <h3>Tournament MVP</h3>
-            <p>The रू 1,000 individual award will be announced after the event.</p>
-          </article>
-        </div>
-      </section>
+          <div class="card">
 
-      <section class="section">
-        <div class="container section-heading">
-          <div>
-            <h2>THE CUP IS READY FOR ITS CONTENDERS.</h2>
-            <p>16 teams · Nepali players only · Opening matchups confirmed</p>
+            ${eyebrow("UNTIL THE NEXT CUP")}
+
+            <h2>THANK YOU FOR BEING PART OF IT.</h2>
+
+            <p>
+              Congratulations to all participating teams.
+              Follow the tournament community for future announcements,
+              events and updates.
+            </p>
+
+            ${button(DISCORD_URL, "Join the Discord community")}
+
           </div>
 
-          ${button("bracket.html", "View bracket")}
         </div>
+
       </section>
+
     </main>
   `;
 }
 
+
 function watchPage() {
   return `
     <main>
-      ${pageHero(
-        "Watch live / Join the community",
-        "FEEL EVERY CLUTCH. SHARE EVERY CHEER.",
-        "Not playing? You can still be part of the Jhilimili Cup. Follow the channels and join the Discord community for tournament updates."
-      )}
+      ${pageHero("Watch live / Join the community", "FEEL EVERY CLUTCH. SHARE EVERY CHEER.", "Not playing? You can still be part of the Jhilimili Cup. Follow the channels and join the Discord community for tournament updates.")}
 
       <section class="section" style="padding-top:15px">
         <div class="container grid-2">
           <article class="card watch-card">
             <div class="watch-icon">▶</div>
             <span class="card-kicker">Official stream destination</span>
-
             <h2>WATCH ON YOUTUBE.</h2>
-
             <p>Visit HealerAiko, AyuzZ and Rakshya's YouTube channels for stream access and broadcast announcements. A specific live-stream schedule has not yet been confirmed.</p>
-
             <div class="watch-channel-links">
               ${button(YOUTUBE_URL, "Open HealerAiko on YouTube")}
               ${button(AYUZZ_YOUTUBE_URL, "Open Ayush on YouTube")}
               ${button(RAKSHYA_YOUTUBE_URL, "Open Rakshya on YouTube")}
             </div>
           </article>
-
           <article class="card watch-card">
             <div class="watch-icon">✦</div>
             <span class="card-kicker">Official community</span>
-
             <h2>JOIN THE DISCORD.</h2>
-
             <p>Find tournament announcements, official rules, bracket updates and any match-viewing details shared by organiser Healer.</p>
-
             ${button(DISCORD_URL, "Join tournament Discord")}
           </article>
         </div>
@@ -830,25 +1201,10 @@ function watchPage() {
         <div class="container">
           ${eyebrow("Your viewing checklist")}
           <h2>BE READY FOR FINALS NIGHT.</h2>
-
           <div class="grid-3" style="margin-top:25px">
-            <article class="card">
-              <span class="info-number">01</span>
-              <h3>Follow the channel</h3>
-              <p>Subscribe to the YouTube channel and check for event-stream announcements.</p>
-            </article>
-
-            <article class="card">
-              <span class="info-number">02</span>
-              <h3>Join the server</h3>
-              <p>Discord is the official home for rules, updates and tournament communications.</p>
-            </article>
-
-            <article class="card">
-              <span class="info-number">03</span>
-              <h3>Keep the dates free</h3>
-              <p>October 28–November 1, 2026. The tournament starts at 9:00 PM NST on opening night.</p>
-            </article>
+            <article class="card"><span class="info-number">01</span><h3>Follow the channel</h3><p>Subscribe to the YouTube channel and check for event-stream announcements.</p></article>
+            <article class="card"><span class="info-number">02</span><h3>Join the server</h3><p>Discord is the official home for rules, updates and tournament communications.</p></article>
+            <article class="card"><span class="info-number">03</span><h3>Keep the dates free</h3><p>October 28–November 1, 2026. The tournament starts at 9:00 PM NST on opening night.</p></article>
           </div>
         </div>
       </section>
@@ -866,10 +1222,7 @@ function registerPage() {
 
       <div class="form-grid">
         <div class="field">
-          <label for="player${i + 1}">
-            Player ${i + 1} Name *
-          </label>
-
+          <label for="player${i + 1}">Player ${i + 1} Name *</label>
           <input
             id="player${i + 1}"
             name="Player ${i + 1} Name"
@@ -880,10 +1233,7 @@ function registerPage() {
         </div>
 
         <div class="field">
-          <label for="riot${i + 1}">
-            Player ${i + 1} Riot ID *
-          </label>
-
+          <label for="riot${i + 1}">Player ${i + 1} Riot ID *</label>
           <input
             id="riot${i + 1}"
             name="Player ${i + 1} Riot ID"
@@ -897,7 +1247,6 @@ function registerPage() {
           <label for="discord${i + 1}">
             Player ${i + 1} Discord username (optional)
           </label>
-
           <input
             id="discord${i + 1}"
             name="Player ${i + 1} Discord"
@@ -918,6 +1267,7 @@ function registerPage() {
       )}
 
       <section class="container form-layout">
+
         <form
           class="form-card"
           id="registration-form"
@@ -931,9 +1281,7 @@ function registerPage() {
           >
 
           <section class="form-section">
-            <h2>
-              <span class="info-number">01</span> TEAM & CAPTAIN
-            </h2>
+            <h2><span class="info-number">01</span> TEAM & CAPTAIN</h2>
 
             <p>
               Required fields are marked *. The captain is the main
@@ -941,6 +1289,7 @@ function registerPage() {
             </p>
 
             <div class="form-grid">
+
               <div class="field full">
                 <label for="teamName">Team name *</label>
                 <input
@@ -953,10 +1302,7 @@ function registerPage() {
               </div>
 
               <div class="field">
-                <label for="captainName">
-                  Captain's player name *
-                </label>
-
+                <label for="captainName">Captain's player name *</label>
                 <input
                   id="captainName"
                   name="Captain Name"
@@ -970,7 +1316,6 @@ function registerPage() {
                 <label for="captainDiscord">
                   Captain's Discord username *
                 </label>
-
                 <input
                   id="captainDiscord"
                   name="Captain Discord"
@@ -984,7 +1329,6 @@ function registerPage() {
                 <label for="captainEmail">
                   Captain's email address *
                 </label>
-
                 <input
                   id="captainEmail"
                   type="email"
@@ -994,13 +1338,12 @@ function registerPage() {
                   placeholder="captain@example.com"
                 >
               </div>
+
             </div>
           </section>
 
           <section class="form-section">
-            <h2>
-              <span class="info-number">02</span> LOCK IN YOUR FIVE
-            </h2>
+            <h2><span class="info-number">02</span> LOCK IN YOUR FIVE</h2>
 
             <p>
               Five starting players are required. Enter each Riot ID,
@@ -1020,11 +1363,9 @@ function registerPage() {
             </p>
 
             <div class="form-grid">
-              <div class="field">
-                <label for="subName">
-                  Substitute player name
-                </label>
 
+              <div class="field">
+                <label for="subName">Substitute player name</label>
                 <input
                   id="subName"
                   name="Substitute Name"
@@ -1034,10 +1375,7 @@ function registerPage() {
               </div>
 
               <div class="field">
-                <label for="subRiot">
-                  Substitute Riot ID
-                </label>
-
+                <label for="subRiot">Substitute Riot ID</label>
                 <input
                   id="subRiot"
                   name="Substitute Riot ID"
@@ -1050,7 +1388,6 @@ function registerPage() {
                 <label for="subDiscord">
                   Substitute Discord username
                 </label>
-
                 <input
                   id="subDiscord"
                   name="Substitute Discord"
@@ -1058,13 +1395,12 @@ function registerPage() {
                   placeholder="Discord username"
                 >
               </div>
+
             </div>
           </section>
 
           <section class="form-section">
-            <h2>
-              <span class="info-number">03</span> BEFORE YOU SUBMIT
-            </h2>
+            <h2><span class="info-number">03</span> BEFORE YOU SUBMIT</h2>
 
             <p>
               Read the full official tournament rules on Discord
@@ -1078,7 +1414,6 @@ function registerPage() {
                 value="Confirmed"
                 required
               >
-
               <span>
                 I confirm all players on this roster meet the
                 tournament's Nepali-player eligibility requirement. *
@@ -1092,16 +1427,13 @@ function registerPage() {
                 value="Accepted"
                 required
               >
-
               <span>
                 I have read and agree to the official tournament
                 rules shared on Discord. *
               </span>
             </label>
 
-            <p class="gold">
-              Free entry. No payment required.
-            </p>
+            <p class="gold">Free entry. No payment required.</p>
 
             <button class="btn" type="submit">
               Submit Team Registration ↗
@@ -1116,18 +1448,15 @@ function registerPage() {
             ></div>
 
             <p style="font-size:11px; margin-top:15px">
-              Registration is closed. The form is kept here for
-              reference; new submissions are disabled.
+              Registration is closed. The form is kept here for reference; new submissions are disabled.
             </p>
           </section>
         </form>
 
         <aside class="sidebar-sticky">
-          <div class="side-card">
-            <span class="card-kicker">
-              ● Entries closed October 26
-            </span>
 
+          <div class="side-card">
+            <span class="card-kicker">● Entries closed October 26</span>
             <h2>REGISTRATION CLOSED.</h2>
             <p>रू 21,000 total prize pool</p>
 
@@ -1154,18 +1483,17 @@ function registerPage() {
 
           <div class="card">
             <h3>NEED A HAND?</h3>
-
             <p>
               Contact Healer on Discord for tournament help
               and the full official rules.
             </p>
-
             ${button(
               DISCORD_URL,
               "Contact Healer",
               "btn btn-outline"
             )}
           </div>
+
         </aside>
       </section>
     </main>
@@ -1190,12 +1518,7 @@ function setupNavigation() {
 
   toggle.addEventListener("click", () => {
     const isOpen = nav.classList.toggle("open");
-
-    toggle.setAttribute(
-      "aria-expanded",
-      String(isOpen)
-    );
-
+    toggle.setAttribute("aria-expanded", String(isOpen));
     toggle.textContent = isOpen ? "✕ Close" : "☰ Menu";
   });
 }
@@ -1207,15 +1530,12 @@ function setupScheduleFilters() {
   buttons.forEach(button => {
     button.addEventListener("click", () => {
       buttons.forEach(item => item.classList.remove("active"));
-
       button.classList.add("active");
 
       const selected = button.dataset.filter;
 
       rows.forEach(row => {
-        row.hidden =
-          selected !== "all" &&
-          row.dataset.day !== selected;
+        row.hidden = selected !== "all" && row.dataset.day !== selected;
       });
     });
   });
@@ -1227,55 +1547,33 @@ function setupRegistration() {
   if (!form) return;
 
   const message = document.getElementById("form-message");
-
   if (REGISTRATION_CLOSED) {
     form.classList.add("registration-closed");
-
-    form.querySelectorAll(
-      "input, button[type=submit]"
-    ).forEach(control => {
+    form.querySelectorAll("input, button[type=submit]").forEach(control => {
       control.disabled = true;
     });
-
-    const submit = form.querySelector(
-      'button[type="submit"]'
-    );
-
-    if (submit) {
-      submit.textContent = "Registration closed";
-    }
-
+    const submit = form.querySelector('button[type="submit"]');
+    if (submit) submit.textContent = "Registration closed";
     message.hidden = false;
-
-    message.textContent =
-      "Registration closed on October 26, 2026. New team submissions are no longer accepted.";
-
-    form.addEventListener("submit", event => {
-      event.preventDefault();
-    });
-
+    message.textContent = "Registration closed on October 26, 2026. New team submissions are no longer accepted.";
+    form.addEventListener("submit", event => event.preventDefault());
     return;
   }
 
   form.addEventListener("submit", event => {
-    const subName = document
-      .getElementById("subName").value.trim();
-
-    const subRiot = document
-      .getElementById("subRiot").value.trim();
-
-    const subDiscord = document
-      .getElementById("subDiscord").value.trim();
+    const subName = document.getElementById("subName").value.trim();
+    const subRiot = document.getElementById("subRiot").value.trim();
+    const subDiscord = document.getElementById("subDiscord").value.trim();
 
     const hasSubstitute = Boolean(
       subName || subRiot || subDiscord
     );
 
+    // If any substitute detail is entered, require the name and Riot ID.
     if (hasSubstitute && (!subName || !subRiot)) {
       event.preventDefault();
 
       message.hidden = false;
-
       message.textContent =
         "Please enter the substitute's player name and Riot ID, " +
         "or clear all substitute fields.";
@@ -1293,10 +1591,7 @@ function setupRegistration() {
 function init() {
   const renderPage = renderers[currentPage] || homePage;
 
-  app.innerHTML =
-    header() +
-    renderPage() +
-    footer();
+  app.innerHTML = header() + renderPage() + footer();
 
   setupNavigation();
   setupScheduleFilters();
